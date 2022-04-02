@@ -86,62 +86,62 @@ function App() {
             <CharacterCard key={item.id} item={item} loading={loading}></CharacterCard>
           ))
         }
-        {
-          <div className="pagination-container">
-            <button onClick={() => previousPage()}>
-              <img className="left-icon" src="./icons/left.png" alt="Left Icon" />
-            </button>
-
-            {
-              currentPage === 1 || currentPage === 2 || currentPage === 3
-                ? <button className="unselected-page"></button>
-                : <button className="unselected-page" onClick={() => changePage(1)}>1</button>
-            }
-
-
-            {
-              currentPage === 1 || currentPage === 2 || currentPage === 3
-                ? currentPage === 3
-                  ? <button className="unselected-page" onClick={() => changePage(1)}>1</button>
-                  : <button className="unselected-page"></button>
-                : <button className="unselected-page" onClick={() => skipThreePage("before")}>...</button>
-            }
-
-
-            {
-              currentPage === 1
-                ? <button className="unselected-page"></button>
-                : <button className="unselected-page" onClick={() => changePage(currentPage - 1)}>{currentPage - 1}</button>
-            }
-
-            <button className="selected-page">{currentPage}</button>
-
-            {
-              currentPage === maxElement
-                ? <button className="unselected-page"></button>
-                : <button className="unselected-page" onClick={() => changePage(currentPage + 1)}>{currentPage + 1}</button>
-            }
-
-            {
-              currentPage === maxElement || currentPage === maxElement - 1 || currentPage === maxElement - 2
-                ? currentPage === maxElement - 2
-                  ? <button className="unselected-page" onClick={() => changePage(maxElement)}>{maxElement}</button>
-                  : <button className="unselected-page"></button>
-                : <button className="unselected-page" onClick={() => skipThreePage("after")}>...</button>
-            }
-
-            {
-              currentPage === maxElement || currentPage === maxElement - 1 || currentPage === maxElement - 2
-                ? <button className="unselected-page"></button>
-                : <button className="unselected-page" onClick={() => changePage(maxElement)}>{maxElement}</button>
-            }
-
-            <button onClick={() => nextPage()}>
-              <img className="right-icon" src="./icons/right.png" alt="Right Icon" />
-            </button>
-          </div>
-        }
       </section>
+      {
+        <div className="pagination-container">
+          <button onClick={() => previousPage()}>
+            <img className="left-icon" src="./icons/left.png" alt="Left Icon" />
+          </button>
+
+          {
+            currentPage === 1 || currentPage === 2 || currentPage === 3
+              ? <button className="unselected-page"></button>
+              : <button className="unselected-page" onClick={() => changePage(1)}>1</button>
+          }
+
+
+          {
+            currentPage === 1 || currentPage === 2 || currentPage === 3
+              ? currentPage === 3
+                ? <button className="unselected-page" onClick={() => changePage(1)}>1</button>
+                : <button className="unselected-page"></button>
+              : <button className="unselected-page" onClick={() => skipThreePage("before")}>...</button>
+          }
+
+
+          {
+            currentPage === 1
+              ? <button className="unselected-page"></button>
+              : <button className="unselected-page" onClick={() => changePage(currentPage - 1)}>{currentPage - 1}</button>
+          }
+
+          <button className="selected-page">{currentPage}</button>
+
+          {
+            currentPage === maxElement
+              ? <button className="unselected-page"></button>
+              : <button className="unselected-page" onClick={() => changePage(currentPage + 1)}>{currentPage + 1}</button>
+          }
+
+          {
+            currentPage === maxElement || currentPage === maxElement - 1 || currentPage === maxElement - 2
+              ? currentPage === maxElement - 2
+                ? <button className="unselected-page" onClick={() => changePage(maxElement)}>{maxElement}</button>
+                : <button className="unselected-page"></button>
+              : <button className="unselected-page" onClick={() => skipThreePage("after")}>...</button>
+          }
+
+          {
+            currentPage === maxElement || currentPage === maxElement - 1 || currentPage === maxElement - 2
+              ? <button className="unselected-page"></button>
+              : <button className="unselected-page" onClick={() => changePage(maxElement)}>{maxElement}</button>
+          }
+
+          <button onClick={() => nextPage()}>
+            <img className="right-icon" src="./icons/right.png" alt="Right Icon" />
+          </button>
+        </div>
+      }
     </div>
   );
 }
