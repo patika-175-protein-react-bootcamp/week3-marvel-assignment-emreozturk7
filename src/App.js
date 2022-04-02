@@ -4,28 +4,40 @@ import axios from 'axios';
 
 const hash = "31d1793ffc28589ecedf05e6d0a38cc4";
 const publicKey = "171e333a1dec2eeb5595ef5d54f5d3bc";
-// const privateKey = "e883e47a0fcab2a80bf8de905ca542648e6601f8";
 
-let offset = 1540;
 
 function App() {
   const [items, setItems] = useState([]);
   const [loading, setLoading] = useState(false);
-  const [posts, setPosts] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
-  const [postsPerPage, setPostsPerPage] = useState(78);
+  const [maxElement, setMaxelement] = useState();
+  const [offsetValue, setOffsetvalue] = useState(0);
+
 
   useEffect(() => {
     const fetch = async () => {
       setLoading(true);
-      const result = await axios(`http://gateway.marvel.com/v1/public/characters?limit=20&offset=${offset}?ts=1&apikey=${publicKey}&hash=${hash}`);
+      const result = await axios(`http://gateway.marvel.com/v1/public/characters?offset=${offsetValue}?limit=20?ts=1&apikey=${publicKey}&hash=${hash}`);
       setItems(result.data.data.results);
-      console.log(result.data.data.results);
+      setMaxelement(result.data.data.total / result.data.data.limit);
       setLoading(false);
     }
     fetch();
-  }, []);
+  }, [offsetValue]);
 
+  function nextPage() {
+    if (currentPage !== 78) {
+      setCurrentPage(currentPage + 1);
+      setOffsetvalue(offsetValue + 20);
+    }
+
+  }
+  function previousPage() {
+    if (currentPage !== 1) {
+      setCurrentPage(currentPage - 1);
+      setOffsetvalue(offsetValue - 20);
+    }
+  }
   return (
     <div className="App">
       <div className="header">
@@ -35,24 +47,58 @@ function App() {
       <section className="hero-container">
         {
           items.map(item => (
-            <CharacterCard key={item.id} item={item}></CharacterCard>
+            <CharacterCard key={item.id} item={item} loading={loading}></CharacterCard>
           ))
         }
         {
           <div className="pagination-container">
-            <a href=".">
+            <button onClick={() => previousPage()}>
               <img className="left-icon" src="./icons/left.png" alt="Left Icon" />
+            </button>
+
+            <a className="unselected-page" href=".">
+              {
+                currentPage === 1 || currentPage === 2 || currentPage === 3
+                  ? null
+                  : 1
+              }
             </a>
-            <a href=".">1</a>
-            <a href=".">...</a>
-            <a href=".">99</a>
-            <a className="selected-page" href=".">100</a>
-            <a href=".">101</a>
-            <a href=".">...</a>
-            <a href=".">200</a>
-            <a href=".">
+
+            <a className="unselected-page" href=".">
+              {
+                currentPage === 1 || currentPage === 2 || currentPage === 3
+                  ? currentPage === 3
+                    ? 1
+                    : null
+                  : "..."
+              }
+            </a>
+
+            <a className="unselected-page" href=".">{currentPage === 1 ? null : currentPage - 1}</a>
+            <a className="selected-page" href=".">{currentPage}</a>
+            <a className="unselected-page" href=".">{currentPage === maxElement ? null : currentPage + 1}</a>
+
+            <a className="unselected-page" href=".">
+              {
+                currentPage === maxElement || currentPage === maxElement - 1 || currentPage === maxElement - 2
+                  ? currentPage === maxElement - 2
+                    ? maxElement
+                    : null
+                  : "..."
+              }
+            </a>
+
+            <a className="unselected-page" href=".">
+              {
+                currentPage === maxElement || currentPage === maxElement - 1 || currentPage === maxElement - 2
+                  ? null
+                  : maxElement
+              }
+            </a>
+
+            <button onClick={() => nextPage()}>
               <img className="right-icon" src="./icons/right.png" alt="Right Icon" />
-            </a>
+            </button>
           </div>
         }
       </section>
@@ -60,33 +106,27 @@ function App() {
   );
 }
 
-const CharacterCard = ({ item }) => {
+const CharacterCard = ({ item, loading }) => {
   return (
     <div className="container">
       <div className="hero-container">
         <div className="hero-card">
-          <figure>
-            <img src={item.thumbnail.path + "." + item.thumbnail.extension} />
-            <figcaption>{item.name}</figcaption>
-          </figure>
+          {
+            loading === false
+              ?
+              <figure>
+                <img className="card-images" alt={item.name} src={item.thumbnail.path + "." + item.thumbnail.extension} />
+                <figcaption>{item.name}</figcaption>
+              </figure>
+              :
+              <figure>
+                <img className="loading" alt="Loading" src="./images/loading.png" />
+              </figure>
+          }
         </div>
       </div>
     </div>
   )
-}
-
-const Posts = ({ posts, loading }) => {
-  if (loading) {
-    return <h2>Loading...</h2>
-  }
-
-  return <ul>
-    {
-      posts.map(post => (
-        <li key={post.id}> {post.name}</li>
-      ))
-    }
-  </ul>
 }
 
 export default App;
