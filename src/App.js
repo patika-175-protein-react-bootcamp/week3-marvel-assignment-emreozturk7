@@ -12,32 +12,68 @@ function App() {
   const [currentPage, setCurrentPage] = useState(1);
   const [maxElement, setMaxelement] = useState();
   const [offsetValue, setOffsetvalue] = useState(0);
+  const [datas, setDatas] = useState([]);
+  const [location, setLocation] = useState([]);
 
 
   useEffect(() => {
-    const fetch = async () => {
-      setLoading(true);
-      const result = await axios(`http://gateway.marvel.com/v1/public/characters?offset=${offsetValue}?limit=20?ts=1&apikey=${publicKey}&hash=${hash}`);
-      setItems(result.data.data.results);
-      setMaxelement(result.data.data.total / result.data.data.limit);
-      setLoading(false);
-    }
     fetch();
   }, [offsetValue]);
+
+  const fetch = async () => {
+    if (location.includes(currentPage)) {
+      setItems(datas[location.indexOf(currentPage)]);
+    }
+    else {
+      setLoading(true);
+
+      const result = await axios(`http://gateway.marvel.com/v1/public/characters?offset=${offsetValue}?limit=20?ts=1&apikey=${publicKey}&hash=${hash}`);
+      setItems(result.data.data.results);
+
+      if (!datas.includes(result.data.data.results[0].id)) {
+        sessionStorage.setItem('array', JSON.stringify(datas));
+        setDatas([...datas, result.data.data.results]);
+      }
+
+      if (!location.includes(currentPage)) {
+        setLocation([...location, currentPage]);
+        sessionStorage.setItem('deneme', JSON.stringify(location));
+      }
+      setMaxelement(result.data.data.total / result.data.data.limit);
+
+      setLoading(false);
+    }
+  }
+
+  const changePage = (pageNumber) => {
+    setCurrentPage(pageNumber);
+    setOffsetvalue((pageNumber * 20) - 20);
+  }
+
+  const skipThreePage = (keep) => {
+    if (keep === "before") {
+      setCurrentPage(currentPage - 3);
+    }
+    else if (keep === "after") {
+      setCurrentPage(currentPage + 3);
+    }
+    setOffsetvalue((currentPage * 20) - 20)
+  }
 
   function nextPage() {
     if (currentPage !== 78) {
       setCurrentPage(currentPage + 1);
       setOffsetvalue(offsetValue + 20);
     }
-
   }
+
   function previousPage() {
     if (currentPage !== 1) {
       setCurrentPage(currentPage - 1);
       setOffsetvalue(offsetValue - 20);
     }
   }
+
   return (
     <div className="App">
       <div className="header">
@@ -56,45 +92,49 @@ function App() {
               <img className="left-icon" src="./icons/left.png" alt="Left Icon" />
             </button>
 
-            <a className="unselected-page" href=".">
-              {
-                currentPage === 1 || currentPage === 2 || currentPage === 3
-                  ? null
-                  : 1
-              }
-            </a>
+            {
+              currentPage === 1 || currentPage === 2 || currentPage === 3
+                ? <button className="unselected-page"></button>
+                : <button className="unselected-page" onClick={() => changePage(1)}>1</button>
+            }
 
-            <a className="unselected-page" href=".">
-              {
-                currentPage === 1 || currentPage === 2 || currentPage === 3
-                  ? currentPage === 3
-                    ? 1
-                    : null
-                  : "..."
-              }
-            </a>
 
-            <a className="unselected-page" href=".">{currentPage === 1 ? null : currentPage - 1}</a>
-            <a className="selected-page" href=".">{currentPage}</a>
-            <a className="unselected-page" href=".">{currentPage === maxElement ? null : currentPage + 1}</a>
+            {
+              currentPage === 1 || currentPage === 2 || currentPage === 3
+                ? currentPage === 3
+                  ? <button className="unselected-page" onClick={() => changePage(1)}>1</button>
+                  : <button className="unselected-page"></button>
+                : <button className="unselected-page" onClick={() => skipThreePage("before")}>...</button>
+            }
 
-            <a className="unselected-page" href=".">
-              {
-                currentPage === maxElement || currentPage === maxElement - 1 || currentPage === maxElement - 2
-                  ? currentPage === maxElement - 2
-                    ? maxElement
-                    : null
-                  : "..."
-              }
-            </a>
 
-            <a className="unselected-page" href=".">
-              {
-                currentPage === maxElement || currentPage === maxElement - 1 || currentPage === maxElement - 2
-                  ? null
-                  : maxElement
-              }
-            </a>
+            {
+              currentPage === 1
+                ? <button className="unselected-page"></button>
+                : <button className="unselected-page" onClick={() => changePage(currentPage - 1)}>{currentPage - 1}</button>
+            }
+
+            <button className="selected-page">{currentPage}</button>
+
+            {
+              currentPage === maxElement
+                ? <button className="unselected-page"></button>
+                : <button className="unselected-page" onClick={() => changePage(currentPage + 1)}>{currentPage + 1}</button>
+            }
+
+            {
+              currentPage === maxElement || currentPage === maxElement - 1 || currentPage === maxElement - 2
+                ? currentPage === maxElement - 2
+                  ? <button className="unselected-page" onClick={() => changePage(maxElement)}>{maxElement}</button>
+                  : <button className="unselected-page"></button>
+                : <button className="unselected-page" onClick={() => skipThreePage("after")}>...</button>
+            }
+
+            {
+              currentPage === maxElement || currentPage === maxElement - 1 || currentPage === maxElement - 2
+                ? <button className="unselected-page"></button>
+                : <button className="unselected-page" onClick={() => changePage(maxElement)}>{maxElement}</button>
+            }
 
             <button onClick={() => nextPage()}>
               <img className="right-icon" src="./icons/right.png" alt="Right Icon" />
